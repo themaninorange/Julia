@@ -1,0 +1,324 @@
+//nvcc fractalSimpleCPUError.cu -o temp -lglut -lGL -lm -run
+
+#include <GL/glut.h>
+#include <stdlib.h>
+#include <iostream>
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include <signal.h>
+
+using namespace std;
+
+float *pixelsJulia_CPU, *pixelsMandel_CPU;
+
+float *pixelsJulia_GPU, *pixelsMandel_GPU;
+
+//dim3 dimBlock;
+
+/*float A = -0.624;
+float B = 0.4351; // */
+
+float A = 0;
+float B = 0.75; // */
+float t = 0;
+float tmod = 100.0;
+float titer = 1.0;
+float moveiter = 1.0;
+int N = 100;
+
+unsigned int window_width = 1024;
+unsigned int window_height = 1024;
+
+float xMin = -2.0;
+float xMax =  2.0;
+float yMin = -2.0;
+float yMax =  2.0;
+
+float stepSizeX = (xMax - xMin)/((float)window_width);
+float stepSizeY = (yMax - yMin)/((float)window_height);
+
+void AllocateMemory(){
+	cudaMalloc((void**)&pixelsJulia_GPU, window_width*window_height*3*sizeof(float));
+	pixelsJulia_CPU = (float *)malloc(window_width*window_height*3*sizeof(float));
+	cudaMalloc((void**)&pixelsMandel_GPU, window_width*window_height*3*sizeof(float));
+	pixelsMandel_CPU = (float *)malloc(window_width*window_height*3*sizeof(float));
+} // */	//Saves the appropriate memory chunks for later use.
+	//References the globally defined variables.
+
+float color (float x, float y)	//hopefully centered on (0,0)? 
+{
+	float mag,maxMag,t1;
+	float maxCount = 200;
+	float count = 0;
+	maxMag = 10;
+	mag = 0.0;
+
+	while (mag < maxMag && count < maxCount) 
+	{
+		t1 = x;	
+		x = x*x - y*y + A;
+		y = (2.0 * t1 * y) + B;
+		mag = sqrt(x*x + y*y);
+		count++;
+	}
+	if(count < maxCount) 
+	{
+		return(1.0);
+	}
+	else
+	{
+		return(0.0);
+	}// */
+}
+
+__global__ void cudaColorJulia(float *pixelsJulia_GPU, float X, float iY){
+	
+	float x = (((float)threadIdx.x)/(blockDim.x))*4-2;
+	float y = (((float)blockIdx.x)/(gridDim.x))*4-2;
+	float mag,maxMag, t1;
+	int maxCount = 200;
+	int count = 0;
+	maxMag = 10;
+	mag = 0.0;
+
+	while (mag < maxMag && count < maxCount) 
+	{
+		t1 = x;	
+		x = x*x - y*y + X;
+		y = (2.0 * t1 * y) + iY;
+		mag = sqrt(x*x + y*y);
+		count++;
+	}
+	if(count < maxCount) 
+	{
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3] = 
+			0.5*log((double)count)/log((double)maxCount); 
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 1] =
+			1.0*log((double)count)/log((double)maxCount); 
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 2] = 
+			0.4;
+	}
+	else
+	{
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3] = 0.0;
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 1] = 0.0;
+		pixelsJulia_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 2] = 0.0;
+
+	}// */
+	
+
+}
+
+__global__ void cudaColorMandelbrot(float *pixelsMandel_GPU, float xseed, float yseed){
+	
+	float x = 0;
+	float y = 0;
+	float X = (((float)threadIdx.x)/(blockDim.x))*4-2.5;
+	float iY = (((float)blockIdx.x)/(gridDim.x))*4-2;
+	float mag,maxMag, t1;
+	int maxCount = 200;
+	int count = 0;
+	maxMag = 10;
+	mag = 0.0;
+	
+	if ((abs(xseed - (float)threadIdx.x/blockDim.x*4+2.5) <= 2.0/blockDim.x) && (abs(yseed - (float)blockIdx.x/gridDim.x*4+2)) <=2.0/gridDim.x){
+	//If this pixel corresponds to the seed for the Julia set being generated,
+		pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3] = 1.0;
+		pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 1] = 0.0;
+		pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 2] = 0.0;
+		//... make this pixel red.
+	}
+	else{
+	//Otherwise, find the color the way we normally would with the Mandelbrot set.
+	
+		while (mag < maxMag && count < maxCount){
+		//As long as the complex number doesn't get farther than a certain distance,
+		// and as long as we haven't iterated this enough times,
+			t1 = x;	
+			x = x*x - y*y + X;
+			y = (2.0 * t1 * y) + iY;
+			mag = sqrt(x*x + y*y);
+			count++;
+			//... find the next point in the sequence and update to it.
+		}
+		if(count < maxCount){
+		//If we broke the above loop before iterating as many times as we want,
+		// then the sequence diverges,
+		
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3] = 
+				0.5*log((double)count)/log((double)maxCount); 
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 1] =
+				1.0*log((double)count)/log((double)maxCount); 
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 2] = 
+				0.4;
+			//... and we color it prettily according to how quickly it diverged.
+		}
+		else
+		//Otherwise, the point is in the mandelbrot set (or close enough to it),
+		{
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3] = 0.0;
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 1] = 0.0;
+			pixelsMandel_GPU[(blockIdx.x*blockDim.x + threadIdx.x)*3 + 2] = 0.0;
+			//... and we color it black.
+		}
+	}
+}// */
+void update(int value){
+	
+	//t = t + titer;
+	/*A = -pow(sin(t/tmod),2);
+	B = sin(2*t/tmod)/2;// */
+	/*A = -pow(sin((2*t/5)/50.0),2);
+	B = sin((2*t/3)/50.0)/2;// */
+	A = -pow(sin((2.0*t/5)/tmod),2);
+	B = sin((sqrt(5)+1)/2*(t)/tmod)/2;// */
+	glutPostRedisplay();
+	glutTimerFunc(25,update, 0);
+}
+
+/*static void signalHandler(int signum) {
+	int command;
+	bool exitMenu = 0;
+	//cout << "I handled it :)" << endl;
+	
+	while (exitMenu == 0) {
+	    	cout << "Enter 0 to exit the program." << endl;
+		cout << "Enter 1 to continue." << endl;
+		cin >> command;
+		
+		if(command == 0) {
+			exitMenu = 1;
+		} else if (command == 1){
+			exitMenu = 1;
+			cout << "resuming..." << endl;
+		} else {
+			cout << "Invalid Command!" << endl;
+		}
+		cout << endl;
+	}
+}// */
+
+/*void processSpecialKeys(int key, int x, int y) {
+
+	switch(key) {
+		case GLUT_KEY_RIGHT :
+				t = t + titer*100;	break;
+		case GLUT_KEY_LEFT :
+				t = t - titer*100;	break;
+		case GLUT_KEY_UP :
+				titer = titer*1.1;	break;
+		case GLUT_KEY_DOWN :
+				titer = titer/1.1;	break;
+	}
+}// */
+
+void processSpecialKeys(int key, int x, int y) {
+
+	switch(key) {
+		case GLUT_KEY_RIGHT :
+			A = A + moveiter/1024;	break;
+		case GLUT_KEY_LEFT :
+			A = A + moveiter/1024;	break;
+		case GLUT_KEY_UP :
+			B = B + moveiter/1024;	break;
+		case GLUT_KEY_DOWN :
+			B = B + moveiter/1024;	break;
+	}
+}// */
+
+void processNormalKeys(unsigned char key, int x, int y) {
+
+	if(key == 43){		//Plus sign key, '+'
+		moveiter = moveiter * 1.1;
+	}else if(key == 45){	//Minus sign key, '-'
+		moveiter = moveiter/1.1;
+	}
+}// */
+
+void mouseClicks(int button, int state, int x, int y) {
+
+	switch(button) {
+		case GLUT_LEFT_BUTTON :
+			A = (float)x/window_width*4.0-2.5;
+			B = (float)y/window_height*4.0-2.5;	break;
+		case GLUT_RIGHT_BUTTON :
+			break;
+	}
+	glutPostRedisplay();
+}// */
+
+void displayJulia(void) 
+{ 
+	cudaColorJulia<<<1024, 1024>>>(pixelsJulia_GPU, A, B);
+	cudaMemcpy(pixelsJulia_CPU, pixelsJulia_GPU,
+		window_width*window_height*3*sizeof(float),
+		cudaMemcpyDeviceToHost);
+	glDrawPixels(window_width, window_height, GL_RGB, GL_FLOAT, pixelsJulia_CPU); 
+	glFlush(); 
+	
+}
+
+void displayMandelbrot(void) 
+{ 
+	cudaColorMandelbrot<<<1024, 1024>>>(pixelsMandel_GPU, A, B);
+	cudaMemcpy(pixelsMandel_CPU, pixelsMandel_GPU,
+		window_width*window_height*3*sizeof(float),
+		cudaMemcpyDeviceToHost);
+	glDrawPixels(window_width, window_height, GL_RGB, GL_FLOAT, pixelsMandel_CPU); 
+	glFlush(); 
+}
+
+__global__ void Addition(float *A, float *B, float *C, int n){
+	int tid = threadIdx.x;
+	int bid = blockIdx.x;
+	if(tid < n){
+		C[bid*1024 + tid] = A[bid*1024 + tid] + B[bid*1024 +tid]; 
+	}
+}
+
+void CleanUp(float *A_CPU, float *B_CPU, float *C_CPU, 
+	     float *A_GPU, float *B_GPU, float *C_GPU){
+	free(A_CPU);
+	free(B_CPU);
+	free(C_CPU);
+
+	cudaFree(A_GPU);
+	cudaFree(B_GPU);
+	cudaFree(C_GPU);
+} // */	
+
+
+int main(int argc, char *argv[])
+{ 
+	if(argc == 2){
+		char *ptr;
+		N = strtol(argv[1], &ptr, 10);
+	}
+	else if(argc > 2){
+		printf("One or zero arguments expected.");
+		return(1);
+	}
+	
+	AllocateMemory();
+	
+   	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+   	glutInitWindowSize(window_width, window_height);
+   	
+   	glutCreateWindow("Subwindow");
+   	glutDisplayFunc(displayMandelbrot);
+   	int mandelID = glutGetWindow();
+   	glutMouseFunc(mouseClicks);
+	glutSpecialFunc(processSpecialKeys);
+	glutKeyboardFunc(processNormalKeys);//*/
+	
+   	glutCreateWindow("Fractals man, fractals.");
+   	glutDisplayFunc(displayJulia);
+   	int juliaID = glutGetWindow();
+	glutSpecialFunc(processSpecialKeys);
+	glutTimerFunc(16, update, 0)
+	;
+	glutMainLoop();
+}
+
