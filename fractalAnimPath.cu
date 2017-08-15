@@ -205,16 +205,19 @@ float timeChange(char pathChoice){
 	switch(pathChoice){
 		case 'A' :
 			if(t < 0.02){
-				return(5*titer*t + 0.000001);
+				return(titer*t + 0.000001);
+			} else if(t < 0.1){
+				return(1.8*titer*t + 0.02 + 0.000001);
 			} else if(t < 0.6){
-				return(0.5*titer + 0.000001);
-			} else if(t < 0.75){
-				return()
+				return(0.2*titer*0.1 + 0.000001);
+			} else if(t < 0.805){
+				return(0.5*titer*(fabs(t - 0.7025 )/0.205) + 0.000001);
+			} else{
+				return(0.5*titer*((-t + 1)/0.25) + 0.000001);
 			}
-			return(titer*(0.10001 - 0.1*2*fabs(t - 0.5)));
 			break;
 		case 'B' :
-
+			return(1);
 			break;
 		case 'C' :
 			return(1);
