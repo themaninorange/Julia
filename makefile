@@ -1,4 +1,4 @@
-progname = 'fractalAnim3.2'
+progname = 'fractalAnim3.3output'
 
 all: progmake
 

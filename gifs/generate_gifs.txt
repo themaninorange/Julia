@@ -108,3 +108,27 @@ move_v13.gif{
     float coordinatesf[] = {0, 0}; 
 
 }
+
+move_o0.gif{
+    float mi[] = {-0.05, 0.635, 0, 0};
+    float ci[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {-1.57, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {1.57, 0};
+}
+
+move_o1.gif{
+    float mi[] = {-0.05, 0.635, 0, 0};
+    float ci[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 6.283185};
+} 
