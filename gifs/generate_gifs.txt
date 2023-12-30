@@ -1,0 +1,110 @@
+increment_m0.gif{
+
+    float mi[] = {-1.5, 0.35, 0, 0};
+    float ci[] = {0, 0, 0, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {0.5, 0.35, 0.000000, 0.000000 }; 
+    float cf[] = {0.0, 0.0, 0.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+}
+
+decrement_m1.gif{
+
+    float mi[] = {0.3, 0.75, 0, 0};
+    float ci[] = {0, 0, 0, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+    
+    float mf[] = {0.3, -0.75, 0, 0};
+    float cf[] = {0.0, 0.0, 0.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+increment_m2.gif{
+
+    float mi[] = {-0.05, 0.635, -1.0, 0};
+    float ci[] = {0, 0, 0, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] =  {-0.05, 0.635, 1.0, 0};
+    float cf[] = {0.0, 0.0, 0.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+increment_m3.gif{
+
+    float mi[] = {-0.05, 0.635, 0, -1.0};
+    float ci[] = {0, 0, 0, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] =  {-0.05, 0.635, 0, 1.0};
+    float cf[] = {0.0, 0.0, 0.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+increment_c01.gif{
+
+    float mi[] = {-0.05, 0.635, 0, 0};
+    float ci[] = {-1, -1, 0, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {1.0, 1.0, 0.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+increment_c2.gif{
+
+    float mi[] = {-0.05, 0.635, -1, 0};
+    float ci[] = {0, 0, -1, 0};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {0.0, 0.0, 1.0, 0.0 }; 
+    float vf[] = {2, 0, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+move_v01.gif{
+
+    float mi[] = {-0.05, 0.635, 0, 0};
+    float ci[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vf[] = {-0.2, -0.2, 0, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
+
+move_v13.gif{
+
+    float mi[] = {-0.05, 0.635, 0, 0};
+    float ci[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vi[] = {2, 0, 0, 0};
+    float coordinatesi[] = {0, 0};
+
+    float mf[] = {-0.05, 0.635, 0, 0};
+    float cf[] = {0.251298, 0.004800, 0.000000, 0.000000};
+    float vf[] = {0.01, 0, 2, 0};
+    float coordinatesf[] = {0, 0}; 
+
+}
