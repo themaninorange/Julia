@@ -52,16 +52,13 @@ From the center of the view to the center of the right edge of the view, establi
 
 Keyboard keys <kbd>5</kbd> to increase and <kbd>T</kbd> to decrease the real component of the horizontal vector.  v[0]
 Keyboard keys <kbd>6</kbd> to increase and <kbd>Y</kbd> to decrease the i-component of the horizontal vector.  v[1]
-![move_v01](https://github.com/themaninorange/Julia/blob/master/gifs/move_v01.gif "Adjust the horizontal vector from the positive real direction to the negative real and negative i direction.  It will appear to shrink and spin in the same way that this vector decreases in magnitude and spins.")
-Note: These two motions are combined to show the diagonal motion of this vector
-
+![move_v01](https://github.com/themaninorange/Julia/blob/master/gifs/move_v01.gif "Adjust the horizontal vector from the positive real direction to the negative real and negative i direction.  It will appear to shrink and spin in the same way that this vector decreases in magnitude and spins.  Note: These two motions are combined to show the diagonal motion of this vector")
 Keyboard keys <kbd>7</kbd> to increase and <kbd>U</kbd> to decrease the j-component of the horizontal vector.  v[2]
-![move_v13](https://github.com/themaninorange/Julia/blob/master/gifs/move_v13.gif "Adjust the horizontal vector from the positive real direction to the positive j direction.  As the view changes, we see different slices through this 4-dimensional space.")
-Note: These two motions are combined to show the diagonal motion.
+![move_v13](https://github.com/themaninorange/Julia/blob/master/gifs/move_v13.gif "Adjust the horizontal vector from the positive real direction to the positive j direction.  As the view changes, we see different slices through this 4-dimensional space.  Note: These two motions are combined to show the diagonal motion.")
 
 Keyboard keys <kbd>8</kbd> to increase and <kbd>I</kbd> to decrease the k-component of the horizontal vector.  v[3]
 
-###Changing the horizontal direction of the Julia-side view.
+###Changing the vertical direction of the Julia-side view.
 
 From the center of the view to the center of the top of the view, establish a vector.  This vector has four dimensions.  However, because the horizontal vector was established first, this vector must be from a smaller subset of this space.  For more details, [see here](coordinates.pdf).  The end result is that we can control this vector with only two dimensions, analogous to latitude and longitude.
 

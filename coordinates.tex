@@ -8,44 +8,54 @@ Quaternions are four-dimensional numbers.  As the complex numbers have a real co
 
 An example of how a quaternion is represented:
 
-$$1 + 4i - 2j + 1.125k \cong [ 1, 4, -2, 1.125 ]$$
+$$1 + 4i - 2j + 1.125k \mapsto [ 1, 4, -2, 1.125 ]$$
 
 \section{Four-dimensional space}
 
-Since the quaternions are four dimensional, navigating this space is more complicated than simply using arrow keys to move in four cardinal directions.  The method I have chosen to navigate one point through this space is to assign four keys to an increase in the coordinate for four dimensions, and to assign the four keys below those to a decrease in the corrsponding coordinate.
+Since this is a four dimensional space, navigating this space is more complicated than simply using arrow keys to move in four cardinal directions.  The method I have chosen to navigate one point through this space is to assign four keys to an increase in the coordinate for four dimensions, and to assign the four keys below those to a decrease in the corrsponding coordinate.
 
-In versions 3.2 and earlier, the A-key increases the real component for the mandelbrot seed.  The S-key increases the $i$-components of the mandelbrot seed.  D and F increase the $j$ and $k$ components respectively.  To decrease these vector components, use the Z, X, C, and V keys.
+To choose a seed from the Mandelbrot set, the following four dimensions of control are used
 
-These keys increment or decrement by a variable called moveiter.  If we want to move faster or slower, we can increase or decrease moveiter by using the G and B keys.
+\begin{enumerate}
+    \item (A, Z): Move the seed in the (+, -) real direction.
+    \item (S, X): Move the seed in the (+, -) $i$ direction.
+    \item (D, C): Move the seed in the (+, -) $j$ direction.
+    \item (F, V): Move the seed in the (+, -) $k$ direction.
+\end{enumerate}
 
 \section{Changing our view in Four-dimensional space}
 
-As of version 3.2, the view is limited to a square embedded in this four-dimensional space.  This means that the problem of choosing a view in our space is identical to the problem of embedding squares in this space.  This is the method I have chosen to do this.
+Each view has a center $c$, a horizontal vector $h$ from the center to the right edge, and a vertical vector $v$ from the center to the top edge.  I have imposed the restrictions $|h| = |v|$ and $h \perp v$, so that there is no stretching or skewing in the view.  With these restrictions in place, representing each view is a 10-dimensional problem.
+
+\begin{itemize}
+    \item Four dimensions to identify the center of the view.
+    \item Four dimensions to identify a horizontal vecctor.
+    \item Two dimensions to identify a vertical vector, given our restrictions.
+\end{itemize}
+
+Because of our $h \perp v$ restiction, $h \in \text{span}(v)^\perp$, a 3-dimensional space.  Because of our $|h| = |v|$ restriction, this is further reduced to a 2-sphere of radius $|h|$.  There are many ways that we can identify points on this sphere, with distinct advantages.  As of version 3.3, the only implemented option is with a latitude and longitude system arranged such that $(0^\circ, 0^\circ)$ corresponds to the $i$-axis when $h$ is aligned with the real axis. The current implementation has some known flaws:
+
+\begin{itemize}
+    \item The map is not continuous.  When the real component of $h$ changes from positive to negative, $v$ becomes $-v$.   
+    \item There are two poles, at latitude $\frac{\pi}{2}$ and $-\frac{\pi}{2}$, where a change in longitude has no effect.
+\end{itemize}
+
+As of version 3.3, the view is limited to a square, although the view could in principle be any aspect ratio, as long as $h$ and $v$ are scaled appropriately to prevent stretching.
+
+Within this 10-dimensional problem, we need 10 dimensions of controls.
 
 \begin{enumerate}
-    \item Choose a point, $c$ to serve as the bottom left corner of our view square.  This is a four-dimensional point, and it can be moved around with the 1,2,3,4,Q,W,E,R keys.
-    \item Choose a vector $v$ to serve as the bottom edge of our view square.  This is also four-dimensional, and it can be moved around with the 5,6,7,8,T,Y,U,I keys.
-    \item Choose a vector, $o$, of the same length as $v$, orthogonal to $v$, to serve as the left edge of our view.  This vector is restricted to a 2-sphere, so to choose it, we will use latitude and longitude, which can be moved with the 9,0,O,P keys.
-
+    \item (1, Q): Move the center in the (+, -) real direction.
+    \item (2, W): Move the center in the (+, -) $i$ direction.
+    \item (3, E): Move the center in the (+, -) $j$ direction.
+    \item (4, R): Move the center in the (+, -) $k$ direction.
+    \item (5, T): Adjust $h$ in the (+, -) real direction.
+    \item (6, Y): Adjust $h$ in the (+, -) $i$ direction.
+    \item (7, U): Adjust $h$ in the (+, -) $j$ direction.
+    \item (8, I): Adjust $h$ in the (+, -) $k$ direction.
+    \item (9, O): Adjust the latitude (+,-).
+    \item (0, P): Adjust the longitude (+,-).
 \end{enumerate}
 
-The third item may require explanation.  Let $V$ be a four-dimensional inner product space.  Let $v \in V$ be the vector that we have chosen to be the bottom edge of our view.  Then $W = \text{span}(v)^\perp$, the orthogonal complement of $\text{span}(v)$, is the space from which we must choose the left edge of our view.  This is a three-dimensional space, since $\text{dim}(V) = \text{dim}(\text{span}(v)) + \text{dim}(\text{span}(v)^\perp)$.  From $W$, we can only choose vectors $o$ such that $|o| = |v|$ , because we want this view to be a square.  This restricts the possible values of $o$ to be that of a surface of a sphere in $W$.  QED.
-
-With this fact in mind, the navigation system could apply any method at all of navigating the surface of a sphere.  I have chosen the latitude and longitude method because I believe it to be intuitive, but in future versions I may implement other options.
-
-\section{Conclusion}
-
-To navigate a four-dimensional space as a point, we need four dimensions.  Use the ASDFZXCV keys to navigate the mandelbrot set to choose a seed.  Use the GB keys to increase or decrease how fast this point moves.
-
-To navigate a four-dimensional space as a square, we need ten dimensions:
-\begin{enumerate}
-\item four dimensions for the bottom-left corner
-\item four dimensions for the bottom-right corner
-\item two dimensions for the left edge, which also fixes the other two edges.
-\end{enumerate}
-
-Use the ``=" and ``]" keys to perform a simple zoom centered on the current view.
-
-Use the 1234567890QWERTYUIOP keys to navigate around the julia/fatou set to choose a viewing pane.  Use the ``-" and ``[" keys to increase or decrease how fast these points move.
 
 \end{document}
